@@ -29,7 +29,7 @@ class DataNodeManagerService(rpyc.Service):
 
 
     def get_next_datanodes(self):
-        self.datanode_list = monitor.list()
+        self.datanode_list = monitor.list_active()
         self.datanode_list = [(ip_port.split(':')[0], int(ip_port.split(':')[1])) for ip_port in self.datanode_list]
         print(self.datanode_list)
         # Seleciona os próximos 3 datanodes para balanceamento de carga
@@ -55,7 +55,7 @@ class DataNodeManagerService(rpyc.Service):
     def get_next_datanode_for_streaming(self, file_name):
         datanodes = self.index[file_name]
         datanodes = [f"{ip}:{port}" for ip, port in datanodes]
-        livedatanodes = monitor.aliveFromList(datanodes)
+        livedatanodes = monitor.alive_from_list(datanodes)
         
         livedatanodes = [(ip_port.split(':')[0], int(ip_port.split(':')[1])) for ip_port in livedatanodes]
         

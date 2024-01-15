@@ -27,20 +27,19 @@ class MonitorService(rpyc.Service):
         return list()
 
     # Verifica se o Nó está ativo
-    def exposed_isAlive(self, address):
-        return isAlive(address)
+    def exposed_is_alive(self, address):
+        return is_alive(address)
 
     # Recebe uma lista de Nós e retorna seu subconjunto de todos os Nós ativos
-    def exposed_aliveFromList(self, list):
-        return aliveFromList(list)
+    def exposed_alive_from_list(self, list):
+        return alive_from_list(list)
     
 hosts_data = {}
 
 def register(ip, port):
     address = str(ip) + ":" + str(port)
-    print("Registrando {}".format(address))
+    print(f"Registrando novo Nó {address}")
     hosts_data[address] = datetime.datetime.now()
-    print(hosts_data)
 
 def ping(ip, port):
     address = str(ip) + ":" + str(port)
@@ -48,37 +47,23 @@ def ping(ip, port):
         print("ERRO: ENDEREÇO {} NÃO REGISTRADO".format(address))
         return -1
 
-    print("Endereço Ping = {}".format(address))
+    print(f"ping {address}")
 
     hosts_data[address] = datetime.datetime.now()
 
 
-def isAlive(address):
+def is_alive(address):
     if address in hosts_data and (datetime.datetime.now() - hosts_data[address]) < datetime.timedelta(seconds=20):
         return True
     else: 
         return False
 
-def list():
-    lista = []
-    print(hosts_data)
-    for address in hosts_data:
-        if isAlive(address):
-            lista += [address]
-    print(f'lista = {lista}')
-    return lista
+def list_active():
+        active_list = [address for address in hosts_data if is_alive(address)]
+        return active_list
 
-def aliveFromList(lista):
-    print(f'lista = {lista}')
-    result_list = []
-    for address in lista:
-        print(f"Endereço {address}")
-        if isAlive(address) == True:
-            result_list += [address]
-        else:
-            continue
-    print(f'ativos = {result_list}')
-    return result_list
+def alive_from_list(address_list):
+    return [address for address in address_list if is_alive(address)]
 
 # Inicializa o servidor de objeto remoto e o registra no serviço de nomes
 if __name__ == "__main__":
